@@ -1,11 +1,11 @@
 package com.sa.event_mng.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.sa.event_mng.model.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.sa.event_mng.model.entity.User;
+import java.util.Optional;
 
 
 
@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByIdAndEnabledTrue(Long id);
 
-    List<User> findAllByEnabledTrue();
+    Page<User> findAllByEnabledTrue(Pageable pageable);
 
     Optional<User> findByVerificationToken(String verificationToken);
 

@@ -10,6 +10,8 @@ import com.sa.event_mng.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,11 +119,10 @@ public class OrderService {
         orderRepository.save(order);
     }
 
-    public List<OrderResponse> getMyOrders() {
+    public Page<OrderResponse> getMyOrders(PageRequest pageRequest) {
         User user = getCurrentUser();
-        return orderRepository.findByCustomerId(user.getId()).stream()
-                .map(orderMapper::toOrderResponse)
-                .toList();
+        Page<Order> orderPage = orderRepository.findByCustomerId(user.getId(),pageRequest);
+        return orderPage.map(orderMapper::toOrderResponse);
     }
 
     private User getCurrentUser() {

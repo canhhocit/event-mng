@@ -13,6 +13,8 @@ import com.sa.event_mng.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -64,10 +66,9 @@ public class EventService {
                 return eventMapper.toEventResponse(eventRepository.save(event));
         }
 
-        public List<EventResponse> getAllPublished() {
-                return eventRepository.findByStatus(EventStatus.PUBLISHED).stream()
-                                .map(eventMapper::toEventResponse)
-                                .toList();
+        public Page<EventResponse> getAllPublished(PageRequest pageRequest) {
+                Page<Event> events = eventRepository.findByStatus(EventStatus.PUBLISHED, pageRequest);
+            return events.map(eventMapper::toEventResponse);
         }
 
         public EventResponse getById(Long id) {

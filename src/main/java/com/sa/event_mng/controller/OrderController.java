@@ -9,9 +9,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
@@ -32,9 +33,13 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "Xem lịch sử đơn hàng của tôi")
-    public ApiResponse<List<OrderResponse>> getMyOrders() {
-        return ApiResponse.<List<OrderResponse>>builder()
-                .result(orderService.getMyOrders())
+    public ApiResponse<Page<OrderResponse>> getMyOrders(@RequestParam(defaultValue = "1") int page,
+                                                        @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageRequest = PageRequest.of(
+                page - 1, size,
+                Sort.by("createdAt").descending());
+        return ApiResponse.<Page<OrderResponse>>builder()
+                .result(orderService.getMyOrders(pageRequest))
                 .build();
     }
 }

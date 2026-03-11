@@ -11,10 +11,12 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/events")
@@ -36,9 +38,13 @@ public class EventController {
 
     @GetMapping
     @Operation(summary = "Lấy danh sách sự kiện đã đăng")
-    public ApiResponse<List<EventResponse>> getAllPublished() {
-        return ApiResponse.<List<EventResponse>>builder()
-                .result(eventService.getAllPublished())
+    public ApiResponse<Page<EventResponse>> getAllPublished(@RequestParam(defaultValue = "1") int page,
+                                                            @RequestParam(defaultValue = "10") int size) {
+        PageRequest pageRequest = PageRequest.of(
+                page - 1, size,
+                Sort.by("createdAt").descending());
+        return ApiResponse.<Page<EventResponse>>builder()
+                .result(eventService.getAllPublished(pageRequest))
                 .build();
     }
 

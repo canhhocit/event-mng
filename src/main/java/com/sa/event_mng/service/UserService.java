@@ -1,11 +1,5 @@
 package com.sa.event_mng.service;
 
-import java.util.List;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.sa.event_mng.dto.request.UserUpdateRequest;
 import com.sa.event_mng.dto.response.UserResponse;
 import com.sa.event_mng.exception.AppException;
@@ -13,10 +7,15 @@ import com.sa.event_mng.exception.ErrorCode;
 import com.sa.event_mng.mapper.UserMapper;
 import com.sa.event_mng.model.entity.User;
 import com.sa.event_mng.repository.UserRepository;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -63,9 +62,9 @@ public class UserService {
 
     // findAll
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse> getUsers() {
-        return userRepository.findAllByEnabledTrue().stream()
-                .map(userMapper::toUserResponse).toList();
+    public Page<UserResponse> getUsers(PageRequest pageRequest) {
+        Page<User> userPage = userRepository.findAllByEnabledTrue(pageRequest);
+        return userPage.map(userMapper::toUserResponse);
     }
 
     // Update
