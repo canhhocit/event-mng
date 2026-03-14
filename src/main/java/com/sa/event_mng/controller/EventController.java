@@ -5,8 +5,8 @@ import com.sa.event_mng.dto.response.ApiResponse;
 import com.sa.event_mng.dto.response.EventResponse;
 import com.sa.event_mng.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -63,4 +63,14 @@ public class EventController {
                 .result(eventService.update(id, request))
                 .build();
     }
+
+
+
+//    @GetMapping("/statistics/by-status/{quarter}/{year}/{iduser}")
+//    @Operation(summary = "Thống kê các sự kiện từng quý theo trạng thái (Chủ sự kiện)")
+//    public ApiResponse<EventStatusStatsResponse> getStatisticsByStatus(@PathVariable Long quarter, @PathVariable Long year) {
+//        return ApiResponse.<EventStatusStatsResponse>builder().result(eventService.getEventStatusStats(quarter, year)).build();
+//    }
+
+
 }
