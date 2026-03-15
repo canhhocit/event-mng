@@ -47,7 +47,7 @@ public class StatisticsController {
 
     @GetMapping("/statistics-revenue/{id_organizer}")
     @Operation(summary = "Thống kê doanh thu (chủ sử kiện)")
-    public ApiResponse<List<EventRevenueStatsResponse>> getStatisticsRevenue(@PathVariable("id_organizer") Long id) {
-        return ApiResponse.<List<EventRevenueStatsResponse>>builder().result(statisticsService.getEventRevenueStats(id)).build();
+    public ApiResponse<List<EventRevenueStatsResponse>> getStatisticsRevenue(@PathVariable("id_organizer") Long idOrganizer) {
+        return ApiResponse.<List<EventRevenueStatsResponse>>builder().result(statisticsService.getEventRevenueStats(idOrganizer)).build();
     }
 }

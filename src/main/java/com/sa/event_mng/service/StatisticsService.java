@@ -80,9 +80,9 @@ public class StatisticsService {
                 .build();
     }
 
-    @PreAuthorize("hasRole('ORGANIZER') and #id == authentication.principal.id")
-    public List<EventRevenueStatsResponse> getEventRevenueStats(Long id) {
-        List<EventRevenueStatsProjection> eventRevenueStats = statisticsRepository.findEventRevenueStats(id);
+    @PreAuthorize("hasRole('ORGANIZER') and @securityCustom.isCurrentUser(#idOrganizer, authentication)")
+    public List<EventRevenueStatsResponse> getEventRevenueStats(Long idOrganizer) {
+        List<EventRevenueStatsProjection> eventRevenueStats = statisticsRepository.findEventRevenueStats(idOrganizer);
         return eventRevenueStats.stream()
                 .map(statsMapper::toEventRevenueStatsResponse)
                 .toList();

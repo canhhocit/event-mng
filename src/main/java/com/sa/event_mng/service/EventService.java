@@ -79,20 +79,20 @@ public class EventService {
         }
 
         @Transactional
-        @PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and #id == authentication.principal.id)") // This logic
+        @PreAuthorize("hasRole('ADMIN') or (hasRole('ORGANIZER') and @securityCustom.isOwner(#id, authentication))") // This logic
                                                                                                            // needs
                                                                                                            // adjustment
         public EventResponse update(Long id, EventRequest request) {
                 Event event = eventRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_FOUND));
 
-                // Security check: Only owner or admin
-                String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-                if (!event.getOrganizer().getUsername().equals(currentUsername) &&
-                                !SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                        throw new AppException(ErrorCode.UNAUTHORIZED);
-                }
+//                // Security check: Only owner or admin
+//                String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+//                if (!event.getOrganizer().getUsername().equals(currentUsername) &&
+//                                !SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+//                                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+//                        throw new AppException(ErrorCode.UNAUTHORIZED);
+//                }
 
                 event.setName(request.getName());
                 event.setLocation(request.getLocation());
