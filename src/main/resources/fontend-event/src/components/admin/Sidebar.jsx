@@ -7,7 +7,7 @@ const MENU = [
   { key: "events",     label: "Sự kiện",      icon: "📅" },
   { key: "users",      label: "Người dùng",   icon: "👥" },
   { key: "categories", label: "Danh mục",     icon: "📁" },
-  { key: "orders",     label: "Đơn hàng",     icon: "🧾" },
+  { key: "statis",     label: "Thống kê",     icon: "📈" },
 ];
 
 export default function Sidebar({ active, onSelect }) {
@@ -22,46 +22,60 @@ export default function Sidebar({ active, onSelect }) {
 
   return (
     <div
-      className="d-flex flex-column bg-dark text-white"
-      style={{ width: open ? 220 : 60, minHeight: "100vh", transition: "width 0.2s", flexShrink: 0 }}
+      className="d-flex flex-column bg-white border-end shadow-sm"
+      style={{ width: open ? 260 : 80, minHeight: "100vh", transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)", flexShrink: 0, zIndex: 100 }}
     >
       {/* Logo */}
-      <div className="d-flex align-items-center justify-content-between p-3 border-bottom border-secondary" style={{ minHeight: 64 }}>
+      <div className="d-flex align-items-center justify-content-between p-3 mb-2" style={{ minHeight: 64 }}>
         {open && (
-          <div>
-            <div className="fw-bold" style={{ fontSize: 15 }}>🎟 EVENT MNG</div>
-            <small className="text-secondary" style={{ fontSize: 11 }}>Admin Panel</small>
+          <div className="ps-2">
+            <div className="fw-bold" style={{ fontSize: 18, color: '#0984e3', letterSpacing: '-0.5px' }}>🎟 EVENTMNG</div>
+            <small className="text-secondary fw-medium" style={{ fontSize: 10, display: 'block', marginTop: '-4px' }}>ADMINISTRATION</small>
           </div>
         )}
-        <button className="btn btn-sm btn-dark ms-auto" onClick={() => setOpen((v) => !v)}>
+        <button className="btn btn-sm btn-light ms-auto rounded-circle border-0 shadow-sm" onClick={() => setOpen((v) => !v)} style={{ width: 32, height: 32 }}>
           {open ? "◀" : "▶"}
         </button>
       </div>
 
       {/* Nav */}
-      <nav className="flex-grow-1 py-2 px-2">
+      <nav className="flex-grow-1 px-3 mt-2">
         {MENU.map((m) => (
           <button
             key={m.key}
             onClick={() => onSelect(m.key)}
-            className={`btn w-100 text-start mb-1 d-flex align-items-center gap-2 ${
-              active === m.key ? "btn-primary" : "btn-dark"
+            className={`btn w-100 text-start mb-2 d-flex align-items-center gap-3 transition-all ${
+              active === m.key ? "btn-primary shadow" : "btn-light border-0 text-secondary"
             }`}
-            style={{ fontSize: 14, borderRadius: 8 }}
+            style={{ 
+              padding: '12px 16px', 
+              fontSize: 14, 
+              borderRadius: 12,
+              fontWeight: active === m.key ? 600 : 500
+            }}
             title={!open ? m.label : undefined}
           >
-            <span>{m.icon}</span>
+            <span style={{ fontSize: 18, filter: active === m.key ? 'none' : 'grayscale(1)' }}>{m.icon}</span>
             {open && <span>{m.label}</span>}
           </button>
         ))}
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-top border-secondary">
-        {open && <div className="small text-secondary mb-2 text-truncate">👤 {user?.sub ?? "Admin"}</div>}
+      <div className="p-3 border-top bg-light-subtle">
+        {open && (
+           <div className="d-flex align-items-center gap-2 mb-3 px-2">
+              <div className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style={{ width: 32, height: 32, fontSize: 12 }}>A</div>
+              <div className="overflow-hidden">
+                <div className="small fw-bold text-dark text-truncate">{user?.sub ?? "Administrator"}</div>
+                <div className="text-secondary" style={{ fontSize: 10 }}>Online</div>
+              </div>
+           </div>
+        )}
         <button
-          className={`btn btn-outline-danger btn-sm ${open ? "w-100" : ""}`}
+          className={`btn btn-outline-danger border-2 ${open ? "w-100" : "w-100 rounded-circle p-2"}`}
           onClick={handleLogout}
+          style={{ borderRadius: open ? 10 : '50%', fontSize: 13, fontWeight: 600 }}
           title="Đăng xuất"
         >
           {open ? "Đăng xuất" : "✕"}

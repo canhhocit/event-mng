@@ -5,7 +5,7 @@ import DashboardPage  from "../components/admin/DashboardPage";
 import EventsPage     from "../components/admin/EventsPage";
 import UsersPage      from "../components/admin/UsersPage";
 import CategoriesPage from "../components/admin/CategoriesPage";
-import OrdersPage     from "../components/admin/OrdersPage";
+import StatisticsPage     from "../components/admin/StatisticsPage";
 
 export default function AdminDashboard() {
   const api = useApi();
@@ -16,24 +16,33 @@ export default function AdminDashboard() {
     events:     <EventsPage     api={api} />,
     users:      <UsersPage      api={api} />,
     categories: <CategoriesPage api={api} />,
-    orders:     <OrdersPage     api={api} />,
+    statis:     <StatisticsPage     api={api} />,
   };
 
   const activeMenu = MENU.find((m) => m.key === active);
 
   return (
-    <div className="d-flex" style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+    <div className="d-flex" style={{ minHeight: "100vh", backgroundColor: "#f8f9fa" }}>
       <Sidebar active={active} onSelect={setActive} />
 
-      <div className="flex-grow-1 p-4" style={{ overflow: "auto" }}>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h5 className="mb-0 fw-bold">
-            {activeMenu?.icon} {activeMenu?.label}
-          </h5>
-          <span className="badge bg-danger px-3 py-2">ADMIN</span>
-        </div>
+      <div className="flex-grow-1" style={{ overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        {/* Top Navbar */}
+        <header className="bg-white px-4 py-3 d-flex justify-content-between align-items-center shadow-sm border-bottom" style={{ minHeight: '64px' }}>
+          <div className="d-flex align-items-center">
+            <h5 className="mb-0 fw-bold me-2" style={{ color: '#2d3436' }}>
+              {activeMenu?.icon} {activeMenu?.label}
+            </h5>
+          </div>
+          <div className="d-flex align-items-center gap-3">
+             <button className="btn btn-light btn-sm rounded-circle p-2" title="Notifications">🔔</button>
+             <span className="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2" style={{ borderRadius: '8px' }}>ADMIN</span>
+          </div>
+        </header>
 
-        {PAGE[active] ?? <p className="text-muted">Đang phát triển...</p>}
+        {/* Dynamic Page Content */}
+        <main className="flex-grow-1 p-4" style={{ overflowY: "auto" }}>
+          {PAGE[active] ?? <div className="text-center mt-5 text-muted">Đang phát triển...</div>}
+        </main>
       </div>
     </div>
   );
