@@ -38,6 +38,10 @@ public class EventService {
         CategoryRepository categoryRepository;
         UserRepository userRepository;
         EventMapper eventMapper;
+        
+        @org.springframework.beans.factory.annotation.Value("${app.file.base-url}")
+        @lombok.experimental.NonFinal
+        String fileBaseUrl;
 
         @Transactional
         @PreAuthorize("hasRole('ORGANIZER')")
@@ -137,7 +141,7 @@ public class EventService {
                                 File destinationFile = new File(
                                                 uploadDir.getAbsolutePath() + File.separator + filename);
                                 file.transferTo(destinationFile);
-                                String imageUrl = "http://localhost:8080/event-mng/uploads/" + filename;
+                                String imageUrl = fileBaseUrl + "/" + filename;
                                 images.add(EventImage.builder().imageUrl(imageUrl).event(event).build());
                         } catch (IOException e) {
                                 throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);

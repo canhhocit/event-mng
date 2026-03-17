@@ -67,6 +67,7 @@ public class OrderSeeder {
         System.out.println("Seeded " + orders.size() + " orders");
     }
 
+    @SuppressWarnings("deprecation")
     private BigDecimal randomAmount() {
         double value = 50000 + (5000000 - 50000) * random.nextDouble();
         return BigDecimal.valueOf(value).setScale(2, BigDecimal.ROUND_HALF_UP);
