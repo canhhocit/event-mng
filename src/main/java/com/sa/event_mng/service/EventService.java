@@ -44,6 +44,7 @@ public class EventService {
         String fileBaseUrl;
 
         @Transactional
+        // @PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
         @PreAuthorize("hasRole('ORGANIZER')")
         public EventResponse create(EventRequest request) {
                 log.info("Đang tạo sự kiện mới: Name={}, CategoryID={}", request.getName(), request.getCategoryId());
