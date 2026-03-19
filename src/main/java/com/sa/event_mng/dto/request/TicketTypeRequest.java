@@ -1,8 +1,11 @@
 package com.sa.event_mng.dto.request;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
@@ -10,18 +13,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class TicketTypeRequest {
-
-    @NotNull(message = "UNCATEGORIZED_EXCEPTION") 
-    private Long eventId;
-
-    @NotBlank(message = "UNCATEGORIZED_EXCEPTION")
+    @NotBlank(message = "TICKET_NAME_REQUIRED")
     private String name;
 
-    @NotNull(message = "UNCATEGORIZED_EXCEPTION")
+    private String description;
+
+    @Min(value = 0, message = "TICKET_PRICE_INVALID")
     private BigDecimal price;
 
-    @NotNull(message = "UNCATEGORIZED_EXCEPTION")
+    @Min(value = 1, message = "TICKET_QUANTITY_INVALID")
     private Integer totalQuantity;
 
-    private String description;
+    private Long eventId;
 }

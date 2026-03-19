@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import com.sa.event_mng.dto.response.OrganizerStatsResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -87,6 +88,27 @@ public class EventController {
                         @RequestParam EventStatus status) {
                 return ApiResponse.<EventResponse>builder()
                                 .result(eventService.updateStatus(id, status))
+                                .build();
+        }
+
+        @GetMapping("/organizer/my-events")
+        @PreAuthorize("hasRole('ORGANIZER')")
+        @Operation(summary = "Lấy danh sách sự kiện cá nhân (ORGANIZER)")
+        public ApiResponse<Page<EventResponse>> getMyEvents(
+                        @RequestParam(defaultValue = "1") int page,
+                        @RequestParam(defaultValue = "10") int size) {
+                PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by("createdAt").descending());
+                return ApiResponse.<Page<EventResponse>>builder()
+                                .result(eventService.getMyEvents(pageRequest))
+                                .build();
+        }
+
+        @GetMapping("/organizer/stats")
+        @PreAuthorize("hasRole('ORGANIZER')")
+        @Operation(summary = "Lấy thống kê doanh thu (ORGANIZER)")
+        public ApiResponse<OrganizerStatsResponse> getStats() {
+                return ApiResponse.<OrganizerStatsResponse>builder()
+                                .result(eventService.getOrganizerStats())
                                 .build();
         }
 }
