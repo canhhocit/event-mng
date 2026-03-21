@@ -29,6 +29,7 @@ public class OrganizerStatsResponse {
         private double revenue;
         private double sellThroughRate; // Percentage
         private String status;
+        private String imageUrl;
     }
 
     @Data

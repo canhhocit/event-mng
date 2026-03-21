@@ -228,6 +228,7 @@ public class EventService {
                                         .revenue(rev)
                                         .sellThroughRate(totalTickets > 0 ? (double) sold / totalTickets * 100 : 0)
                                         .status(event.getStatus().name())
+                                        .imageUrl(event.getImages() != null && !event.getImages().isEmpty() ? event.getImages().get(0).getImageUrl() : null)
                                         .build());
                         
                         totalRev += rev;
