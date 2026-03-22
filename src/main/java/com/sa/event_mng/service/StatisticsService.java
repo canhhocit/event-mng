@@ -1,14 +1,8 @@
 package com.sa.event_mng.service;
 
-import com.sa.event_mng.dto.response.EventRevenueStatsAdminResponse;
-import com.sa.event_mng.dto.response.EventRevenueStatsOrganizerResponse;
-import com.sa.event_mng.dto.response.EventStatusStatsResponse;
-import com.sa.event_mng.dto.response.EventTemporalStatsResponse;
+import com.sa.event_mng.dto.response.*;
 import com.sa.event_mng.mapper.StatsMapper;
-import com.sa.event_mng.model.projection.EventRevenueStatsAdminProjection;
-import com.sa.event_mng.model.projection.EventRevenueStatsOrganizerProjection;
-import com.sa.event_mng.model.projection.EventStatusStatsProjection;
-import com.sa.event_mng.model.projection.EventTemporalStatsProjection;
+import com.sa.event_mng.model.projection.*;
 import com.sa.event_mng.repository.StatisticsRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +10,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +89,31 @@ public class StatisticsService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public EventRevenueStatsAdminResponse getEventRevenueStatsAdmin() {
-        EventRevenueStatsAdminProjection eventRevenueStats = statisticsRepository.findEventRevenueAdminStats();
-        return statsMapper.toEventRevenueStatsResponse(eventRevenueStats);
+        EventRevenueStatsAdminProjection totalStats = statisticsRepository.findEventRevenueAdminStats();
+        List<MonthlyRevenueProjection> dbMonthly = statisticsRepository.findMonthlyRevenueAdmin();
+        
+        List<MonthlyRevenueResponse> monthlyList = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        for (int i = 5; i >= 0; i--) {
+            LocalDate date = now.minusMonths(i);
+            int y = date.getYear();
+            int m = date.getMonthValue();
+            
+            BigDecimal rev = dbMonthly.stream()
+                .filter(p -> p.getYear() == y && p.getMonth() == m)
+                .map(MonthlyRevenueProjection::getRevenue)
+                .findFirst().orElse(BigDecimal.ZERO);
+            
+            monthlyList.add(MonthlyRevenueResponse.builder()
+                            .year(y)
+                            .month(m)
+                            .revenue(rev)
+                            .build());
+        }
+
+        return EventRevenueStatsAdminResponse.builder()
+                .totalRevenue(totalStats != null ? totalStats.getTotalRevenue() : BigDecimal.ZERO)
+                .monthlyRevenues(monthlyList)
+                .build();
     }
 }

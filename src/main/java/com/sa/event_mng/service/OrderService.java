@@ -53,7 +53,7 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         //phần trăm tiền admin ăn
-        float platformFeeRate = 0.1f;
+        float platformFeeRate = 0.25f;
 
         //tổng tiền admin ăn
         BigDecimal serviceFee = organizerAmount.multiply(BigDecimal.valueOf(platformFeeRate));

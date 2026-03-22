@@ -57,7 +57,28 @@ public interface StatisticsRepository extends JpaRepository<Event, Long> {
 
     @Query(value = """
     SELECT sum(service_fee) as totalRevenue
-    FROM event_mng.orders
+    FROM orders
     """, nativeQuery = true)
     EventRevenueStatsAdminProjection findEventRevenueAdminStats();
+
+    @Query(value = """
+    SELECT YEAR(created_at) as year, MONTH(created_at) as month, SUM(service_fee) as revenue
+    FROM orders
+    WHERE payment_status = 'PAID'
+    GROUP BY YEAR(created_at), MONTH(created_at)
+    ORDER BY year DESC, month DESC
+    """, nativeQuery = true)
+    List<com.sa.event_mng.model.projection.MonthlyRevenueProjection> findMonthlyRevenueAdmin();
+
+    @Query(value = """
+    SELECT YEAR(o.created_at) as year, MONTH(o.created_at) as month, SUM(oi.subtotal * 0.75) as revenue
+    FROM order_items oi
+    JOIN orders o ON oi.order_id = o.id
+    JOIN ticket_types tt ON oi.ticket_type_id = tt.id
+    JOIN events e ON tt.event_id = e.id
+    WHERE e.organizer_id = :organizerId AND o.payment_status = 'PAID'
+    GROUP BY YEAR(o.created_at), MONTH(o.created_at)
+    ORDER BY year DESC, month DESC
+    """, nativeQuery = true)
+    List<com.sa.event_mng.model.projection.MonthlyRevenueProjection> findMonthlyRevenueOrganizer(@Param("organizerId") Long organizerId);
 }

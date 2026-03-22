@@ -79,4 +79,12 @@ public class UserController {
                                 .result(userService.deleteUser(username))
                                 .build();
         }
+
+        @Operation(summary = "Mở khóa người dùng", description = "Mở khóa tài khoản người dùng theo username(ADMIN)")
+        @PatchMapping("/{username}/unlock")
+        public ApiResponse<String> unlockUser(@PathVariable String username) {
+                return ApiResponse.<String>builder()
+                                .result(userService.unlockUser(username))
+                                .build();
+        }
 }

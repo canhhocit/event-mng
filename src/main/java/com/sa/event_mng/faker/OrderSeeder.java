@@ -50,7 +50,7 @@ public class OrderSeeder {
             PaymentStatus paymentStatus = randomPaymentStatus(orderStatus);
 
             BigDecimal organizerAmount = randomAmount();
-            float platformFeeRate = 0.1f;
+            float platformFeeRate = 0.25f;
             BigDecimal serviceFee = organizerAmount.multiply(BigDecimal.valueOf(platformFeeRate))
                     .setScale(2, BigDecimal.ROUND_HALF_UP);
             BigDecimal totalAmount = organizerAmount.add(serviceFee);

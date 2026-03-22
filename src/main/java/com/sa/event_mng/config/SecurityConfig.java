@@ -29,7 +29,9 @@ public class SecurityConfig {
       "/auth/register",
       "/auth/logout",
       "/auth/refresh",
-      "/auth/introspect"
+      "/auth/introspect",
+      "/auth/forgot-password",
+      "/auth/reset-password"
   };
 
   private final String[] PUBLIC_GET_ENDPOINTS = {

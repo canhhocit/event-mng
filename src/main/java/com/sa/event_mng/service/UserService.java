@@ -54,10 +54,10 @@ public class UserService {
     public Page<UserResponse> getUsers(String search, PageRequest pageRequest) {
         Page<User> userPage;
         if (search == null || search.isBlank()) {
-            userPage = userRepository.findAllByEnabledTrue(pageRequest);
+            userPage = userRepository.findAll(pageRequest);
         } else {
             userPage = userRepository
-                    .findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCaseAndEnabledTrue(
+                    .findByUsernameContainingIgnoreCaseOrFullNameContainingIgnoreCase(
                             search, search, pageRequest);
         }
         return userPage.map(userMapper::toUserResponse);
@@ -102,5 +102,15 @@ public class UserService {
         user.setVerificationToken("");
         userRepository.save(user);
         return "deleted";
+    }
+
+    // Unlock
+    @PreAuthorize("hasRole('ADMIN')")
+    public String unlockUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setEnabled(true);
+        userRepository.save(user);
+        return "unlocked";
     }
 }

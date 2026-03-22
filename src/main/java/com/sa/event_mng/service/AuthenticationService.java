@@ -142,7 +142,6 @@ public class AuthenticationService {
         return "Please check your email to verify your account";
     }
 
-    // verify Email
     public String verifyEmail(String token) {
         User user = userRepository.findByVerificationToken(token)
                 .orElseThrow(() -> new AppException(ErrorCode.INVALID_TOKEN));
@@ -152,6 +151,33 @@ public class AuthenticationService {
         userRepository.save(user);
 
         return "Email đã được xác thực thành công. Vui lòng quay lại ứng dụng để đăng nhập: http://localhost:5173";
+    }
+
+    public String forgotPassword(com.sa.event_mng.dto.request.ForgotPasswordRequest request) {
+        User user = userRepository.findByEmailAndEnabledTrue(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+        user.setVerificationToken(otp); // Reuse verificationToken for OTP
+        userRepository.save(user);
+
+        emailService.sendOtpEmail(user.getEmail(), otp);
+        return "OTP has been sent to your email";
+    }
+
+    public String resetPassword(com.sa.event_mng.dto.request.ResetPasswordRequest request) {
+        User user = userRepository.findByEmailAndEnabledTrue(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if (user.getVerificationToken() == null || !user.getVerificationToken().equals(request.getOtp())) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setVerificationToken(null);
+        userRepository.save(user);
+
+        return "Password has been reset successfully";
     }
 
     public void logout(LogoutRequest request) throws JOSEException, ParseException {

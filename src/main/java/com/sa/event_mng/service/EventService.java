@@ -7,11 +7,11 @@ import com.sa.event_mng.exception.ErrorCode;
 import com.sa.event_mng.mapper.EventMapper;
 import com.sa.event_mng.model.entity.*;
 import com.sa.event_mng.model.enums.EventStatus;
+import com.sa.event_mng.model.projection.MonthlyRevenueProjection;
 import com.sa.event_mng.repository.CategoryRepository;
 import com.sa.event_mng.repository.EventRepository;
 import com.sa.event_mng.repository.UserRepository;
-import com.sa.event_mng.repository.TicketTypeRepository;
-import com.sa.event_mng.repository.OrderRepository;
+import com.sa.event_mng.repository.StatisticsRepository;
 import com.sa.event_mng.dto.response.OrganizerStatsResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +41,7 @@ public class EventService {
         CategoryRepository categoryRepository;
         UserRepository userRepository;
         EventMapper eventMapper;
-        @SuppressWarnings("unused")
-        TicketTypeRepository ticketTypeRepository;
-        @SuppressWarnings("unused")
-        OrderRepository orderRepository;
+        StatisticsRepository statisticsRepository;
         
         @org.springframework.beans.factory.annotation.Value("${app.file.base-url}")
         @lombok.experimental.NonFinal
@@ -235,26 +232,23 @@ public class EventService {
                         totalSold += sold;
                 }
 
-                // Calculate monthly revenues for the last year
-                List<com.sa.event_mng.dto.response.OrganizerStatsResponse.MonthlyRevenue> monthlyRevenues = new ArrayList<>();
+                // Calculate monthly revenues for the last 6 months
+                List<MonthlyRevenueProjection> dbStats = statisticsRepository.findMonthlyRevenueOrganizer(organizer.getId());
+                List<OrganizerStatsResponse.MonthlyRevenue> monthlyRevenues = new ArrayList<>();
                 java.time.LocalDate now = java.time.LocalDate.now();
+                
                 for (int i = 5; i >= 0; i--) {
                         java.time.LocalDate date = now.minusMonths(i);
                         int year = date.getYear();
                         int month = date.getMonthValue();
                         
-                        @SuppressWarnings("unused")
-                        double monthlyRev = 0;
-                        // In a real project, this should be a DB aggregation query for performance.
-                        // Here we iterate for simplicity.
-                        for (Event event : myEvents) {
-                                monthlyRev += event.getTicketTypes().stream()
-                                                .flatMap(tt -> tt.getEvent().getTicketTypes().stream()) // This is wrong, should check orders
-                                                .mapToDouble(tt -> 0) // Placeholder
-                                                .sum();
-                        }
-                        // Note: For now, I will use a simpler approximation so the FE has something to show.
-                        monthlyRevenues.add(new com.sa.event_mng.dto.response.OrganizerStatsResponse.MonthlyRevenue(year, month, totalRev * (0.1 + Math.random() * 0.2))); 
+                        java.math.BigDecimal monthlyRev = dbStats.stream()
+                                        .filter(p -> p.getYear() == year && p.getMonth() == month)
+                                        .map(MonthlyRevenueProjection::getRevenue)
+                                        .findFirst()
+                                        .orElse(java.math.BigDecimal.ZERO);
+                        
+                        monthlyRevenues.add(new OrganizerStatsResponse.MonthlyRevenue(year, month, monthlyRev));
                 }
 
                 return OrganizerStatsResponse.builder()

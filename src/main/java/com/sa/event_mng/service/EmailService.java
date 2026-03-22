@@ -23,4 +23,17 @@ public class EmailService {
 
         mailSender.send(email);
     }
+
+    public void sendOtpEmail(String to, String otp) {
+        String subject = "Mã xác thực quên mật khẩu";
+        String message = "Mã OTP để đặt lại mật khẩu của bạn là: " + otp + "\n" +
+                         "Nếu bạn không yêu cầu, vui lòng bỏ qua email này.";
+
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setText(message);
+
+        mailSender.send(email);
+    }
 }

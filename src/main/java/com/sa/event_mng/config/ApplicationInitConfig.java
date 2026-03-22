@@ -38,6 +38,8 @@ public class ApplicationInitConfig {
                 .username("admin")
                 .password(passwordEncoder.encode("admin"))
                 .fullName("ADMIN-MANAGERMENT")
+                .email("admin@gmail.com")
+                .phone("0123456789")
                 .role(Role.ADMIN)
                 .enabled(true)
                 .build();

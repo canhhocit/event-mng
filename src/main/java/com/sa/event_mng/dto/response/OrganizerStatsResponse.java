@@ -39,6 +39,6 @@ public class OrganizerStatsResponse {
     public static class MonthlyRevenue {
         private int year;
         private int month;
-        private double revenue;
+        private java.math.BigDecimal revenue;
     }
 }

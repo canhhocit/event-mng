@@ -45,6 +45,20 @@ public class AuthenticationController {
         return authenticationService.verifyEmail(token);
     }
 
+    @Operation(summary = "Yêu cầu mã OTP lấy lại mật khẩu")
+    @PostMapping("/forgot-password")
+    public ApiResponse<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+        var result = authenticationService.forgotPassword(request);
+        return ApiResponse.<String>builder().result(result).build();
+    }
+
+    @Operation(summary = "Đặt lại mật khẩu với mã OTP")
+    @PostMapping("/reset-password")
+    public ApiResponse<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        var result = authenticationService.resetPassword(request);
+        return ApiResponse.<String>builder().result(result).build();
+    }
+
     @Operation(summary = "Kiểm tra token")
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request)
