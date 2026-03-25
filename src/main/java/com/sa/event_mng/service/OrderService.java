@@ -36,6 +36,7 @@ public class OrderService {
     TicketRepository ticketRepository;
     TicketTypeRepository ticketTypeRepository;
     OrderMapper orderMapper;
+    EmailService emailService;
 
     @Transactional
     public OrderResponse checkout(PaymentMethod paymentMethod) {
@@ -138,6 +139,14 @@ public class OrderService {
             }
         }
         orderRepository.save(order);
+
+        if (order.getCustomer().getEmail() != null) {
+            emailService.sendOrderConfirmation(
+                    order.getCustomer().getEmail(),
+                    order.getId().toString(),
+                    order.getTotalAmount()
+            );
+        }
     }
 
     public Page<OrderResponse> getMyOrders(PageRequest pageRequest) {

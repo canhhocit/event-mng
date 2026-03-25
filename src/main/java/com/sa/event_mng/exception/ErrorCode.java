@@ -36,7 +36,7 @@ public enum ErrorCode {
 
     PASSWORD_WEAK(1015, "Password must contain at least one uppercase letter and one number", HttpStatus.BAD_REQUEST),
 
-    USER_DISABLED(1016, "User account is disabled", HttpStatus.FORBIDDEN),
+    USER_DISABLED(1016, "Tài khoản của bạn đã bị vô hiệu hóa.", HttpStatus.FORBIDDEN),
     USER_UNAUTHORIZED(1017, "Unauthorized access", HttpStatus.UNAUTHORIZED),
 
     PASSWORD_NOT_MATCH(1018, "Password does not match", HttpStatus.BAD_REQUEST),
