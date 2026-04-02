@@ -50,7 +50,8 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
-    config.addAllowedOrigin("http://localhost:5173");// tiện cho react nhá đừng xóa vội 
+    // config.addAllowedOrigin("http://localhost:5173");
+    config.addAllowedOriginPattern("*");
     config.addAllowedMethod("*");
     config.addAllowedHeader("*");
     config.setAllowCredentials(true);

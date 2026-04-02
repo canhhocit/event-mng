@@ -48,28 +48,48 @@ public class OrderService {
             throw new AppException(ErrorCode.CART_EMPTY);
         }
 
-        // tổng tiền btc ăn
-        BigDecimal organizerAmount = cart.getItems().stream()
+        return createOrderFromItems(user, cart.getItems(), paymentMethod, cart);
+    }
+
+    @Transactional
+    public OrderResponse checkoutSelected(List<Long> itemIds, PaymentMethod paymentMethod) {
+        User user = getCurrentUser();
+        Cart cart = cartRepository.findByCustomerId(user.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.CART_EMPTY));
+
+        List<CartItem> selectedItems = cart.getItems().stream()
+                .filter(item -> itemIds.contains(item.getId()))
+                .collect(Collectors.toList());
+
+        if (selectedItems.isEmpty()) {
+            throw new AppException(ErrorCode.CART_EMPTY);
+        }
+
+        return createOrderFromItems(user, selectedItems, paymentMethod, cart);
+    }
+
+    private OrderResponse createOrderFromItems(User user, List<CartItem> items, PaymentMethod paymentMethod, Cart cart) {
+        // Tổng tiền khách phải trả (là tổng subtotal trong giỏ)
+        BigDecimal totalAmount = items.stream()
                 .map(CartItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        //phần trăm tiền admin ăn
+        // Phần trăm hoa hồng (25%)
         float platformFeeRate = 0.25f;
 
-        //tổng tiền admin ăn
-        BigDecimal serviceFee = organizerAmount.multiply(BigDecimal.valueOf(platformFeeRate));
+        // Tiền admin nhận (Dựa trên tổng doanh thu)
+        BigDecimal serviceFee = totalAmount.multiply(BigDecimal.valueOf(platformFeeRate));
 
-        // Tính tổng tiền khách phải trả
-        BigDecimal totalAmount = organizerAmount.add(serviceFee);
+        // Tiền BTC thực nhận sau khi trừ hoa hồng
+        BigDecimal organizerAmount = totalAmount.subtract(serviceFee);
 
-        // Validate each item: Event must be OPENING
-        for (CartItem item : cart.getItems()) {
+        // Validate trạng thái sự kiện
+        for (CartItem item : items) {
             if (item.getTicketType().getEvent().getStatus() != com.sa.event_mng.model.enums.EventStatus.OPENING) {
                 throw new AppException(ErrorCode.EVENT_NOT_OPENING);
             }
         }
 
-        // Create Order
         Order order = Order.builder()
                 .customer(user)
                 .organizerAmount(organizerAmount)
@@ -82,8 +102,7 @@ public class OrderService {
                 .orderDate(LocalDateTime.now())
                 .build();
 
-        // Convert CartItems to OrderItems
-        List<OrderItem> orderItems = cart.getItems().stream()
+        List<OrderItem> orderItems = items.stream()
                 .map(cartItem -> OrderItem.builder()
                         .order(order)
                         .ticketType(cartItem.getTicketType())
@@ -96,11 +115,11 @@ public class OrderService {
         order.setItems(orderItems);
         Order savedOrder = orderRepository.save(order);
 
-        // Simulate successful payment
+        // Giả lập thanh toán
         completePayment(savedOrder.getId());
 
-        // Clear cart
-        cart.getItems().clear();
+        // Xóa các item đã thanh toán khỏi giỏ hàng
+        cart.getItems().removeAll(items);
         cartRepository.save(cart);
 
         return orderMapper.toOrderResponse(savedOrder);

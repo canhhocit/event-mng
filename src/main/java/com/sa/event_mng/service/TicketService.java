@@ -41,10 +41,23 @@ public class TicketService {
     @PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
     public TicketResponse checkIn(String ticketCode) {
         Ticket ticket = ticketRepository.findByTicketCode(ticketCode)
-                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+                .orElseThrow(() -> new AppException(ErrorCode.TICKET_INVALID));
+
+        // Kiểm tra quyền sở hữu đối với ORGANIZER
+        User user = getCurrentUser();
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !ticket.getTicketType().getEvent().getOrganizer().getId().equals(user.getId())) {
+            throw new AppException(ErrorCode.TICKET_NOT_OWNED);
+        }
+
+        if (ticket.getStatus() == TicketStatus.USED) {
+            throw new AppException(ErrorCode.TICKET_USED);
+        }
 
         if (ticket.getStatus() != TicketStatus.VALID) {
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION); // already used or invalid
+            throw new AppException(ErrorCode.TICKET_INVALID);
         }
 
         ticket.setStatus(TicketStatus.USED);

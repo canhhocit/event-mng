@@ -42,16 +42,16 @@ public class EventService {
         UserRepository userRepository;
         EventMapper eventMapper;
         StatisticsRepository statisticsRepository;
+        com.sa.event_mng.repository.TicketTypeRepository ticketTypeRepository; // Thêm repo
         
         @org.springframework.beans.factory.annotation.Value("${app.file.base-url}")
         @lombok.experimental.NonFinal
         String fileBaseUrl;
 
         @Transactional
-        // @PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
         @PreAuthorize("hasRole('ORGANIZER')")
         public EventResponse create(EventRequest request) {
-                log.info("Đang tạo sự kiện mới: Name={}, CategoryID={}", request.getName(), request.getCategoryId());
+                log.info("Đang tạo sự kiện mới kèm vé: Name={}", request.getName());
                 
                 String username = SecurityContextHolder.getContext().getAuthentication().getName();
                 User organizer = userRepository.findByUsername(username)
@@ -78,7 +78,24 @@ public class EventService {
                         event.setImages(images);
                 }
 
-                return eventMapper.toEventResponse(eventRepository.save(event));
+                Event savedEvent = eventRepository.save(event);
+
+                // Thêm: Tạo vé luôn nếu có
+                if (request.getTicketTypes() != null && !request.getTicketTypes().isEmpty()) {
+                        request.getTicketTypes().forEach(ttReq -> {
+                                TicketType tt = TicketType.builder()
+                                                .event(savedEvent)
+                                                .name(ttReq.getName())
+                                                .price(ttReq.getPrice())
+                                                .totalQuantity(ttReq.getTotalQuantity())
+                                                .remainingQuantity(ttReq.getTotalQuantity())
+                                                .description(ttReq.getDescription())
+                                                .build();
+                                ticketTypeRepository.save(tt);
+                        });
+                }
+
+                return eventMapper.toEventResponse(savedEvent);
         }
 
         public Page<EventResponse> getAllPublished(PageRequest pageRequest) {

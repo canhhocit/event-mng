@@ -24,10 +24,18 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping("/checkout")
-    @Operation(summary = "Thanh toán giỏ hàng")
+    @Operation(summary = "Thanh toán toàn bộ giỏ hàng")
     public ApiResponse<OrderResponse> checkout(@RequestParam PaymentMethod paymentMethod) {
         return ApiResponse.<OrderResponse>builder()
                 .result(orderService.checkout(paymentMethod))
+                .build();
+    }
+
+    @PostMapping("/checkout-selected")
+    @Operation(summary = "Thanh toán các mục được chọn trong giỏ hàng")
+    public ApiResponse<OrderResponse> checkoutSelected(@RequestBody java.util.List<Long> itemIds, @RequestParam PaymentMethod paymentMethod) {
+        return ApiResponse.<OrderResponse>builder()
+                .result(orderService.checkoutSelected(itemIds, paymentMethod))
                 .build();
     }
 

@@ -41,4 +41,6 @@ public class EventRequest {
     private EventStatus status;
 
     private List<MultipartFile> files;
+
+    private List<TicketTypeRequest> ticketTypes; 
 }

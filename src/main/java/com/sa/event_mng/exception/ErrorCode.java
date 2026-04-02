@@ -70,7 +70,10 @@ public enum ErrorCode {
     // TicketType validation (7001-7099)
     TICKET_NAME_REQUIRED(7001, "Tên hạng vé không được để trống", HttpStatus.BAD_REQUEST),
     TICKET_PRICE_INVALID(7002, "Giá vé phải lớn hơn hoặc bằng 0", HttpStatus.BAD_REQUEST),
-    TICKET_QUANTITY_INVALID(7003, "Số lượng vé phải lớn hơn 0", HttpStatus.BAD_REQUEST);
+    TICKET_QUANTITY_INVALID(7003, "Số lượng vé phải lớn hơn 0", HttpStatus.BAD_REQUEST),
+    TICKET_INVALID(7004, "Mã vé không hợp lệ", HttpStatus.BAD_REQUEST),
+    TICKET_USED(7005, "Vé này đã được sử dụng trước đó", HttpStatus.BAD_REQUEST),
+    TICKET_NOT_OWNED(7006, "Bạn không có quyền quét vé của sự kiện này", HttpStatus.FORBIDDEN);
 
     private int code;
     private String message;

@@ -102,6 +102,43 @@ public class CartService {
     }
 
     @Transactional
+    public CartResponse updateQuantity(Long itemId, Integer quantity) {
+        if (quantity == null || quantity <= 0) {
+            return removeItem(itemId);
+        }
+
+        User user = getCurrentUser();
+        Cart cart = cartRepository.findByCustomerId(user.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+
+        CartItem item = cart.getItems().stream()
+                .filter(i -> i.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+
+        TicketType tt = item.getTicketType();
+        if (quantity > tt.getRemainingQuantity()) {
+            throw new AppException(ErrorCode.TICKET_NOT_ENOUGH);
+        }
+
+        item.setQuantity(quantity);
+        item.setSubtotal(item.getUnitPrice().multiply(BigDecimal.valueOf(quantity)));
+
+        return cartMapper.toCartResponse(cartRepository.save(cart));
+    }
+
+    @Transactional
+    public CartResponse removeItem(Long itemId) {
+        User user = getCurrentUser();
+        Cart cart = cartRepository.findByCustomerId(user.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION));
+
+        cart.getItems().removeIf(item -> item.getId().equals(itemId));
+
+        return cartMapper.toCartResponse(cartRepository.save(cart));
+    }
+
+    @Transactional
     public void clearCart() {
         User user = getCurrentUser();
         cartRepository.findByCustomerId(user.getId()).ifPresent(cart -> {
