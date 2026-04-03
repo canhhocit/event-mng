@@ -13,7 +13,7 @@ public class EmailService {
 
     public void sendVerificationEmail(String to, String token) {
         String subject = "[Event Manager] Xác thực Email - Email Verification";
-        String verificationUrl = "http://192.168.0.110:8080/event-mng/auth/verify?token=" + token;
+        String verificationUrl = "http://localhost:8080/event-mng/auth/verify?token=" + token;
         String message = "Vui lòng nhấn vào liên kết bên dưới để xác thực email của bạn:\n" + verificationUrl + "\n\n" +
                          "--------------------------------------------------\n" +
                          "Please click the link below to verify your email:\n" + verificationUrl;
